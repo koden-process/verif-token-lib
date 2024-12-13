@@ -205,6 +205,7 @@ License:                                  Apache License
            See the License for the specific language governing permissions and
            limitations under the License.
         
+Project-URL: Homepage, https://github.com/koden-process/verif-token-lib
 Project-URL: Repository, https://github.com/koden-process/verif-token-lib
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: Apache Software License
