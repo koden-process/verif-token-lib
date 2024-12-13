@@ -24,6 +24,7 @@ classifiers = [
 license = {file = "LICENSE"}
 
 [project.urls]
+Homepage = "https://github.com/koden-process/verif-token-lib"
 Repository = "https://github.com/koden-process/verif-token-lib"
 
 [tool.setuptools]
