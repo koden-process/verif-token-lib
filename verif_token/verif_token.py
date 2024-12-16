@@ -1,12 +1,12 @@
+import logging
 from typing import Annotated
 
 import requests
-import logging
-
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPBearer
 from jose import jwt, JWTError, jwk
-from config import API_NAME, KEYCLOAK_URL
+
+from .config import API_NAME, KEYCLOAK_URL
 
 http_bearer = HTTPBearer()
 
