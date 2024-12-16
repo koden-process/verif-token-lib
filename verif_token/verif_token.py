@@ -1,10 +1,9 @@
 import logging
-from typing import Annotated
-
 import requests
-from fastapi import HTTPException, Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
-from jose import jwt, JWTError, jwk
+from jose import JWTError, jwk, jwt
+from typing import Annotated
 
 from .config import API_NAME, KEYCLOAK_URL
 
@@ -37,6 +36,22 @@ def create_rsa_key(public_key):
     return rsa_key
 
 
+def get_rsa_key():
+    jwks_uri = get_config_openid()
+    logging.debug(f"Récupération des clés publiques depuis {jwks_uri}")
+
+    jwks = get_jwks(jwks_uri)
+    logging.debug(f"Clés JWKS récupérées : {jwks}")
+
+    public_key = get_public_key(jwks)
+    logging.debug(f"Clé publique trouvée : {public_key}")
+
+    rsa_key = create_rsa_key(public_key)
+    logging.debug(f"Clé publique construite : {rsa_key}")
+
+    return rsa_key
+
+
 def decode_token(token, rsa_key):
     decoded_token = jwt.decode(token.credentials, rsa_key, algorithms=["RS256"], audience=API_NAME)
     logging.debug(f"Token décodé : {decoded_token}")
@@ -44,30 +59,23 @@ def decode_token(token, rsa_key):
     return decoded_token
 
 
-def verify_token(request: Request, token: Annotated[str, Depends(http_bearer)]):
-    """Vérifier et décoder le token JWT"""
+def get_decoded_token(token):
     try:
-        jwks_uri = get_config_openid()
-        logging.debug(f"Récupération des clés publiques depuis {jwks_uri}")
-
-        jwks = get_jwks(jwks_uri)
-        logging.debug(f"Clés JWKS récupérées : {jwks}")
-
-        public_key = get_public_key(jwks)
-        logging.debug(f"Clé publique trouvée : {public_key}")
-
-        rsa_key = create_rsa_key(public_key)
-        logging.debug(f"Clé publique construite : {rsa_key}")
-
+        rsa_key = get_rsa_key()
 
         logging.debug(f"Token : {token}")
         logging.debug(f"Credentials : {token.credentials}")
 
-        request.state.token_info = decode_token(token, rsa_key)
-        return request.state.token_info
+        decoded_token = decode_token(token, rsa_key)
+        return decoded_token
     except JWTError as e:
         logging.error(f"Erreur de décodage du token JWT : {str(e)}")
         raise HTTPException(status_code = 401, detail = "Invalid token")
     except Exception as e:
         logging.error(f"Erreur lors de la vérification du token : {str(e)}")
         raise HTTPException(status_code = 500, detail = "Internal server error")
+
+
+def verify_token(request: Request, token: Annotated[str, Depends(http_bearer)]):
+    request.state.token_info = get_decoded_token(token)
+    return request.state.token_info
