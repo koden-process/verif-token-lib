@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "verif_token"
-version = "0.1.9"
+version = "0.1.10"
 authors = [
   { name="Sébastien Héligon", email="heligon.seb@gmail.com" },
 ]
