@@ -59,7 +59,6 @@ def decode_token(token, rsa_key):
 
     return decoded_token
 
-
 def get_decoded_token(token):
     try:
         rsa_key = get_rsa_key()
@@ -75,6 +74,9 @@ def get_decoded_token(token):
         logging.error(f"Erreur lors de la vérification du token : {str(e)}")
         raise HTTPException(status_code = 500, detail = "Internal server error")
 
+
+def get_token_info(token: Annotated[str, Depends(http_bearer)]):
+    return get_decoded_token(token)
 
 def verify_token(request: Request, token: Annotated[str, Depends(http_bearer)]):
     request.state.token_info = get_decoded_token(token)
