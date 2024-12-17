@@ -53,7 +53,7 @@ def get_rsa_key():
 
 
 def decode_token(token, rsa_key):
-    decoded_token = jwt.decode(token.credentials, rsa_key, algorithms=["RS256"], audience=API_NAME)
+    decoded_token = jwt.decode(token, rsa_key, algorithms=["RS256"], audience=API_NAME)
     logging.debug(f"Token décodé : {decoded_token}")
 
     return decoded_token
@@ -64,7 +64,6 @@ def get_decoded_token(token):
         rsa_key = get_rsa_key()
 
         logging.debug(f"Token : {token}")
-        logging.debug(f"Credentials : {token.credentials}")
 
         decoded_token = decode_token(token, rsa_key)
         return decoded_token
