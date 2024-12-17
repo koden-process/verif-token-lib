@@ -1,9 +1,10 @@
 import logging
+from typing import Annotated
+
 import requests
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
 from jose import JWTError, jwk, jwt
-from typing import Annotated
 
 from .config import API_NAME, KEYCLOAK_URL
 
@@ -53,7 +54,7 @@ def get_rsa_key():
 
 
 def decode_token(token, rsa_key):
-    decoded_token = jwt.decode(token, rsa_key, algorithms=["RS256"], audience=API_NAME)
+    decoded_token = jwt.decode(token.credentials, rsa_key, algorithms=["RS256"], audience=API_NAME)
     logging.debug(f"Token décodé : {decoded_token}")
 
     return decoded_token
