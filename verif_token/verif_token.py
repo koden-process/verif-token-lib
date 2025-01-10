@@ -2,7 +2,7 @@ import logging
 from typing import Annotated
 
 import requests
-from fastapi import Depends, HTTPException, Request
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
 from jose import JWTError, jwk, jwt
 
@@ -78,6 +78,7 @@ def get_decoded_token(token):
 def get_token_info(token: Annotated[str, Depends(http_bearer)]):
     return get_decoded_token(token)
 
-def verify_token(request: Request, token: Annotated[str, Depends(http_bearer)]):
-    request.state.token_info = get_decoded_token(token)
-    return request.state.token_info
+
+def verify_token(token: Annotated[str, Depends(http_bearer)]):
+    token_info = get_decoded_token(token)
+    return token_info
